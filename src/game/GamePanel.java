@@ -26,9 +26,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 	
 	// Game Stuff
 	private final int SIZE = 10;
-	Entity head;
-	ArrayList<Entity> snake;
-	
+	private Entity head, apple;
+	private ArrayList<Entity> snake;
+	private int score;
+
 	// Movement
 	private int dx, dy;
 	
@@ -121,7 +122,17 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 			e.setPosition(head.getX() + (i * SIZE), head.getY());
 			snake.add(e);
 		}
+		apple = new Entity(SIZE);
+		setApple();
+		score = 0;
 	}
+	
+	public void setApple() {
+		int x = (int) (Math.random() * (WIDTH - SIZE));
+		int y = (int) (Math.random() * (HEIGHT - SIZE));
+		apple.setPosition(x, y);
+	}
+	
 	private void requestRender() {
 		render(g2d);
 		Graphics g = getGraphics();
@@ -157,6 +168,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 			head.move(dx, dy);
 		}
 		
+		if (apple.isCollsion(head)) {
+			score++;
+			setApple();
+		}
 	
 		if(head.getX() < 0) head.setX(WIDTH);
 		if(head.getY() < 0) head.setY(HEIGHT);
@@ -171,5 +186,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 		for(Entity e : snake) {
 			e.render(g2d);
 		}
+		
+		g2d.setColor(Color.RED);
+		apple.render(g2d);
+		
+		g2d.setColor(Color.WHITE);
+		g2d.drawString("Score : " + score, 10, 10);
 	}
 }
