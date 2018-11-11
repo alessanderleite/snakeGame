@@ -29,6 +29,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 	private Entity head, apple;
 	private ArrayList<Entity> snake;
 	private int score;
+	private int level;
+	private boolean gameover;
 
 	// Movement
 	private int dx, dy;
@@ -109,7 +111,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 		g2d = image.createGraphics();
 		running = true;
 		setUplevel();
-		setFPS(10);
+		gameover = false;
+		level = 1;
+		setFPS(level * 10);
 	}
 	public void setUplevel() {
 		snake = new ArrayList<Entity>();
@@ -117,7 +121,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 		head.setPosition(WIDTH / 2, HEIGHT / 2);
 		snake.add(head);
 		
-		for (int i = 1; i < 10; i++) {
+		for (int i = 1; i < 3; i++) {
 			Entity e = new Entity(SIZE);
 			e.setPosition(head.getX() + (i * SIZE), head.getY());
 			snake.add(e);
@@ -131,6 +135,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 		int x = (int) (Math.random() * (WIDTH - SIZE));
 		int y = (int) (Math.random() * (HEIGHT - SIZE));
 		apple.setPosition(x, y);
+		x = x - (x % SIZE);
+		y = y - (y % SIZE);
+		apple.setPosition(x, y);
 	}
 	
 	private void requestRender() {
@@ -140,6 +147,12 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 		g.dispose();
 	}
 	private void update() {
+		if(gameover) {
+			if (start) {
+				setUplevel();
+			}
+			return;
+		}
 		if(up && dy == 0) {
 			dy = -SIZE;
 			dx = 0;
@@ -152,7 +165,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 			dy = 0;
 			dx = -SIZE;
 		}
-		if(right && dx == 0) {
+		if(right && dx == 0 && dy != 0) {
 			dy = 0;
 			dx = SIZE;
 		}
@@ -168,9 +181,25 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 			head.move(dx, dy);
 		}
 		
+		for (Entity e : snake) {
+			if (e.isCollsion(head)) {
+				gameover = true;
+				break;
+			}
+		}
+		
 		if (apple.isCollsion(head)) {
 			score++;
 			setApple();
+			
+			Entity e = new Entity(SIZE);
+			e.setPosition(-100, -100);
+			snake.add(e);
+			if (score % 10 == 0) {
+				level++;
+				if (level > 10) level = 10;
+				setFPS(level * 10);
+			}
 		}
 	
 		if(head.getX() < 0) head.setX(WIDTH);
@@ -189,8 +218,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 		
 		g2d.setColor(Color.RED);
 		apple.render(g2d);
+		if (gameover) {
+			g2d.drawString("GameOver!", 150, 200);
+		}
 		
 		g2d.setColor(Color.WHITE);
-		g2d.drawString("Score : " + score, 10, 10);
+		g2d.drawString("Score : " + score + " level : " + level, 10, 10);
+		if (dx == 0 && dy == 0) {
+			g2d.drawString("Ready!", 150, 200);
+		}
 	}
 }
