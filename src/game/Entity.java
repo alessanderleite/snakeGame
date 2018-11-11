@@ -41,11 +41,9 @@ public class Entity {
 	}
 	
 	public boolean isCollsion(Entity o) {
-		if (o == this) {
-			return false;
-		} else {
-			return getBound().intersects(o.getBound());
-		}
+		if(o == this) return false;
+		return getBound().intersects(o.getBound());
+		
 	}
 	
 	public void render(Graphics2D g2d) {
