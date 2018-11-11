@@ -111,9 +111,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 		g2d = image.createGraphics();
 		running = true;
 		setUplevel();
-		gameover = false;
-		level = 1;
-		setFPS(level * 10);
+
 	}
 	public void setUplevel() {
 		snake = new ArrayList<Entity>();
@@ -129,6 +127,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 		apple = new Entity(SIZE);
 		setApple();
 		score = 0;
+		gameover = false;
+		level = 1;
+		dx = dy = 0;
+		setFPS(level * 10);
 	}
 	
 	public void setApple() {
